@@ -9,11 +9,11 @@
   padding: 4px;
   height: 100%;
   display: grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: 33% 33% 34%;
   grid-template-rows: 50% 50%;
   grid-template-areas:
-    "settings sinewavelive"
-    "settings sinewave"
+    "settings sinewave sinewave"
+    "settings phaseportrait none"
 }
 
 .Dashboard > div {
@@ -31,4 +31,7 @@
 }
 .Network {
   grid-area: network;
+}
+.PhasePortrait {
+  grid-area: phaseportrait;
 }

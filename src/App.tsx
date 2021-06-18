@@ -4,14 +4,19 @@ import { Card, Elevation } from '@blueprintjs/core';
 import { Settings, Structure } from './components/Settings';
 import { Network } from './components/Network';
 import { SineWave } from './components/SineWave';
-import { CTRNN, Node } from 'ctrnn.js';
+import { Ctrnn, Node } from 'ctrnn.js';
+import { PhasePortrait } from './components/PhasePortrait';
+import { getField } from "./sigmoid";
+
+const field = getField();
 
 type Point = { x: number, y: number };
 type AppState = {
   frame: number,
   ctrnn: Structure,
   data: { a: Point[], b: Point[] },
-  fixed: { a: Point[], b: Point[] }
+  fixed: { a: Point[], b: Point[] },
+  phaseData: number[][][]
 }
 
 class App extends React.Component<{}, AppState> {
@@ -19,6 +24,7 @@ class App extends React.Component<{}, AppState> {
     frame: 0,
     data: { a: [], b: [] },
     fixed: { a: [], b: [] },
+    phaseData: [],
     ctrnn: {
       nodes: [
         { bias: -2.75, timeConstant: 1.0 },
@@ -30,10 +36,10 @@ class App extends React.Component<{}, AppState> {
       ]
     }
   };
-  private ctrnn: CTRNN = new CTRNN(2);
+  private ctrnn: Ctrnn = new Ctrnn(2);
   private paused: boolean = false;
 
-  updateNetwork(ctrnn: CTRNN) {
+  updateNetwork(ctrnn: Ctrnn) {
     this.state.ctrnn.nodes.forEach((node, index) => {
       ctrnn.setNode(index, node);
     });
@@ -46,22 +52,7 @@ class App extends React.Component<{}, AppState> {
 
   componentDidMount() {
     this.updateNetwork(this.ctrnn);
-    this.updateFixed();
-
-    const size = 500;
-    setInterval(() => {
-      if (this.paused) return;
-      this.ctrnn.tick([], 0.2);
-
-      const outputs = this.ctrnn.outputs;
-      const data = this.state.data;
-      data.a.push({x: this.state.frame, y: outputs[0]});
-      data.b.push({x: this.state.frame, y: outputs[1]});
-      if (data.a.length > size) data.a.shift();
-      if (data.b.length > size) data.b.shift();
-
-      this.setState({ data: data, frame: this.state.frame + 1 });
-    }, 5);
+    this.update();
   }
 
   onClick() {
@@ -71,28 +62,54 @@ class App extends React.Component<{}, AppState> {
   onChangeNode(id: number, node: Node) {
     this.state.ctrnn.nodes[id] = node;
     this.ctrnn.setNode(id, node);
-    this.updateFixed();
+    this.update();
   }
 
   onChangeWeight(from: number, to: number, weight: number) {
     this.state.ctrnn.weights[to][from] = weight;
     this.ctrnn.setWeight(from, to, weight);
-    this.updateFixed();
+    this.update();
   }
 
   updateFixed() {
-    let ctrnn = new CTRNN(2);
+    let ctrnn = new Ctrnn(2);
     this.updateNetwork(ctrnn);
     const data: { a: Point[], b: Point[] } = {a: [], b: []};
+    let frame = [0, 0];
     for (let i = 0; i < 500; i++) {
-      ctrnn.tick([], 0.2);
+      frame = ctrnn.tick(frame, [], 0.2);
       if (i % 5 === 0) {
-        const outputs = ctrnn.outputs;
+        const outputs = ctrnn.getOutputs(frame);
         data.a.push({x: i, y: outputs[0]});
         data.b.push({x: i, y: outputs[1]});
       }
     }
     this.setState({fixed: data});
+  }
+
+  updatePhase() {
+    let ctrnn = new Ctrnn(2);
+    this.updateNetwork(ctrnn);
+    const data: number[][][] = [];
+    field.forEach((row, y) => {
+      const line: number[][] = [];
+      row.forEach((point, x) => {
+        const control = ctrnn.getOutputs(point);
+        const frame = ctrnn.tick(point, [], 0.2);
+        const outputs = ctrnn.getOutputs(frame);
+        const diff = [outputs[0] - control[0], outputs[1] - control[1]];
+        const mag = Math.hypot(diff[0], diff[1]);
+        // const sqr = Math.sqrt(mag);
+        line.push([diff[0] / mag, diff[1] / mag]);
+      });
+      data.push(line);
+    });
+    this.setState({phaseData: data});
+  }
+
+  update() {
+    this.updateFixed();
+    this.updatePhase();
   }
 
   render() {
@@ -113,14 +130,14 @@ class App extends React.Component<{}, AppState> {
               <Network />
             </Card>
           </div>
-          <div className="SineWaveLive" onClick={this.onClick.bind(this)}>
-            <Card elevation={Elevation.ZERO}>
-              <SineWave a={this.state.data.a} b={this.state.data.b} />
-            </Card>
-          </div>
           <div className="SineWave">
             <Card elevation={Elevation.ZERO}>
               <SineWave a={this.state.fixed.a} b={this.state.fixed.b} />
+            </Card>
+          </div>
+          <div className="PhasePortrait">
+            <Card elevation={Elevation.ZERO}>
+              <PhasePortrait margin={15} data={this.state.phaseData} />
             </Card>
           </div>
         </div>
