@@ -57,8 +57,8 @@ export class PhasePortrait extends React.Component<PhasePortaitProps, {}> {
     this.props.data.forEach((row, y) => {
       // if (y != 10) return;
       row.forEach((point, x) => {
-        context.moveTo(x / 20, y / 20);
-        context.lineTo(x / 20 + point[0] / 40, y / 20 + point[1] / 40);
+        context.moveTo(x / 20, 1 - y / 20);
+        context.lineTo(x / 20 + point[0] / 40, 1 - (y / 20 + point[1] / 40));
       });
     });
     context.strokeStyle = "#808080";
@@ -67,9 +67,9 @@ export class PhasePortrait extends React.Component<PhasePortaitProps, {}> {
     if (this.props.points.length) {
       context.beginPath();
       let pos = this.props.points[0];
-      context.moveTo(pos[0], pos[1]);
+      context.moveTo(pos[0], 1 - pos[1]);
       for (const point of this.props.points) {
-        context.lineTo(point[0], point[1]);
+        context.lineTo(point[0], 1 - point[1]);
       }
       context.strokeStyle = "#d9822b";
       context.stroke();
