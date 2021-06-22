@@ -98,8 +98,12 @@ class App extends React.Component<{}, AppState> {
     field.forEach((row, y) => {
       const line: number[][] = [];
       row.forEach((point, x) => {
-        const control = ctrnn.getOutputs(point);
-        const frame = ctrnn.tick(point, [], 0.2);
+        const biased = [
+          point[0] - this.state.ctrnn.nodes[0].bias,
+          point[1] - this.state.ctrnn.nodes[1].bias
+        ];
+        const control = ctrnn.getOutputs(biased);
+        const frame = ctrnn.tick(biased, [], 0.2);
         const outputs = ctrnn.getOutputs(frame);
         const diff = [outputs[0] - control[0], outputs[1] - control[1]];
         const mag = Math.hypot(diff[0], diff[1]);

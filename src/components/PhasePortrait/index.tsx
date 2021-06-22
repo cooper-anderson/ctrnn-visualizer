@@ -55,10 +55,10 @@ export class PhasePortrait extends React.Component<PhasePortaitProps, {}> {
 
     context.beginPath();
     this.props.data.forEach((row, y) => {
+      // if (y != 10) return;
       row.forEach((point, x) => {
-        let h = (20 - y) / 20;
-        context.moveTo(x / 20, h);
-        context.lineTo(x / 20 + point[0] / 40, h - point[1] / 40);
+        context.moveTo(x / 20, y / 20);
+        context.lineTo(x / 20 + point[0] / 40, y / 20 + point[1] / 40);
       });
     });
     context.strokeStyle = "#808080";
