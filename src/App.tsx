@@ -16,7 +16,8 @@ type AppState = {
   ctrnn: Structure,
   data: { a: Point[], b: Point[] },
   fixed: { a: Point[], b: Point[] },
-  phaseData: number[][][]
+  phaseData: number[][][],
+  points: number[][]
 }
 
 class App extends React.Component<{}, AppState> {
@@ -25,6 +26,7 @@ class App extends React.Component<{}, AppState> {
     data: { a: [], b: [] },
     fixed: { a: [], b: [] },
     phaseData: [],
+    points: [],
     ctrnn: {
       nodes: [
         { bias: -2.75, timeConstant: 1.0 },
@@ -75,6 +77,7 @@ class App extends React.Component<{}, AppState> {
     let ctrnn = new Ctrnn(2);
     this.updateNetwork(ctrnn);
     const data: { a: Point[], b: Point[] } = {a: [], b: []};
+    const points: number[][] = [];
     let frame = [0, 0];
     for (let i = 0; i < 500; i++) {
       frame = ctrnn.tick(frame, [], 0.2);
@@ -82,9 +85,10 @@ class App extends React.Component<{}, AppState> {
         const outputs = ctrnn.getOutputs(frame);
         data.a.push({x: i, y: outputs[0]});
         data.b.push({x: i, y: outputs[1]});
+        points.push(outputs);
       }
     }
-    this.setState({fixed: data});
+    this.setState({fixed: data, points: points});
   }
 
   updatePhase() {
@@ -137,7 +141,8 @@ class App extends React.Component<{}, AppState> {
           </div>
           <div className="PhasePortrait">
             <Card elevation={Elevation.ZERO}>
-              <PhasePortrait margin={15} data={this.state.phaseData} />
+              <PhasePortrait margin={15} data={this.state.phaseData}
+                points={this.state.points} />
             </Card>
           </div>
         </div>

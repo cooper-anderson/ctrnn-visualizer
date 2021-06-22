@@ -3,6 +3,7 @@ import "./index.css"
 
 type PhasePortaitProps = {
   data: number[][][],
+  points: number[][],
   margin: number
 };
 
@@ -62,6 +63,17 @@ export class PhasePortrait extends React.Component<PhasePortaitProps, {}> {
     });
     context.strokeStyle = "#808080";
     context.stroke();
+
+    if (this.props.points.length) {
+      context.beginPath();
+      let pos = this.props.points[0];
+      context.moveTo(pos[0], pos[1]);
+      for (const point of this.props.points) {
+        context.lineTo(point[0], point[1]);
+      }
+      context.strokeStyle = "#d9822b";
+      context.stroke();
+    }
 
     context.resetTransform();
 
