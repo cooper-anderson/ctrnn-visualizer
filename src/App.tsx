@@ -40,6 +40,8 @@ class App extends React.Component<{}, AppState> {
   };
   private ctrnn: Ctrnn = new Ctrnn(2);
   private paused: boolean = false;
+  private start: number[] = [0.05, 0.15];
+  private animating: boolean = false;
 
   updateNetwork(ctrnn: Ctrnn) {
     this.state.ctrnn.nodes.forEach((node, index) => {
@@ -73,12 +75,31 @@ class App extends React.Component<{}, AppState> {
     this.update();
   }
 
+  onChangeStart(point: Point) {
+    const app = this;
+    const old = this.start;
+    const offset = [point.x - old[0], point.y - old[1]];
+    const dist = Math.hypot(offset[0], offset[1]);
+    const duration = Math.max(Math.round(dist * 25), 5);
+    let t = 1;
+    if (this.animating) return;
+    this.animating = true;
+    function animate() {
+      const p = Math.pow(t / duration, 2);
+      app.start = [old[0] + offset[0] * p, old[1] + offset[1] * p];
+      app.update();
+      if (t++ < duration) requestAnimationFrame(animate);
+      else app.animating = false;
+    }
+    requestAnimationFrame(animate);
+  }
+
   updateFixed() {
     let ctrnn = new Ctrnn(2);
     this.updateNetwork(ctrnn);
     const data: { a: Point[], b: Point[] } = {a: [], b: []};
     const points: number[][] = [];
-    let frame = [0, 0];
+    let frame = ctrnn.frameFromOutput(this.start);
     const initial = ctrnn.getOutputs(frame);
     data.a.push({x: 0, y: initial[0]});
     data.b.push({x: 0, y: initial[1]});
@@ -152,7 +173,8 @@ class App extends React.Component<{}, AppState> {
           <div className="PhasePortrait">
             <Card elevation={Elevation.ZERO}>
               <PhasePortrait margin={15} data={this.state.phaseData}
-                points={this.state.points} />
+                points={this.state.points}
+                onChangeStart={this.onChangeStart.bind(this)} />
             </Card>
           </div>
         </div>

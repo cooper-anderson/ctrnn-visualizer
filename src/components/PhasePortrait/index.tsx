@@ -1,10 +1,12 @@
 import React from "react"
 import "./index.css"
 
+type Point = {x: number, y: number};
 type PhasePortaitProps = {
   data: number[][][],
   points: number[][],
-  margin: number
+  margin: number,
+  onChangeStart: (point: Point) => void
 };
 
 export class PhasePortrait extends React.Component<PhasePortaitProps, {}> {
@@ -20,13 +22,31 @@ export class PhasePortrait extends React.Component<PhasePortaitProps, {}> {
   render() {
     const element = (
       <div ref={this.divRef} className="PhasePortrait-div">
-        <canvas ref={this.canvasRef}></canvas>
+        <canvas ref={this.canvasRef} onClick={this.click.bind(this)}></canvas>
       </div>
     );
 
     this.draw();
 
     return element
+  }
+
+  screenToGraphSpace(position: Point): Point {
+    const canvas = this.canvasRef.current;
+    if (!canvas) return {x: 0.5, y: 0.5};
+    const center = { x: canvas.width / 2, y: canvas.height / 2 };
+    const click = {
+      x: position.x - canvas.offsetLeft,
+      y: position.y - canvas.offsetTop
+    };
+    const offset = { x: click.x - center.x, y: click.y - center.y };
+    const size = Math.min(canvas.width, canvas.height) - 2 * this.props.margin;
+    return { x: 0.5 + offset.x / size, y: 0.5 - offset.y / size };
+  }
+
+  click(event: React.MouseEvent<HTMLCanvasElement>) {
+    const pos = this.screenToGraphSpace({x: event.clientX, y: event.clientY});
+    this.props.onChangeStart(pos);
   }
 
   draw() {
