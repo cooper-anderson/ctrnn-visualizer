@@ -25,13 +25,14 @@ export class SineWave extends React.Component<SineWaveProps, {}> {
 							data: this.props.b
 						}
 					]}
+					curve="basis"
 					enablePoints={false}
 					enableGridX={true}
 					enableGridY={true}
 					colors={["#137cbd", "#0f9960"]}
 					theme={{textColor: "#137cbd", grid: {line: {stroke: "#141414"}}}}
 					margin={{top: margin, bottom: margin, left: margin, right: margin}}
-					xScale={{min: (this.props.a[0] || {x: 0}).x, type: "linear"}}
+					xScale={{min: (this.props.a[0] || {x: 0}).x, max: 3000, type: "linear"}}
 					yScale={{max: 1, min: 0, type: "linear"}}
 					isInteractive={false}
 					/>
