@@ -79,7 +79,11 @@ class App extends React.Component<{}, AppState> {
     const data: { a: Point[], b: Point[] } = {a: [], b: []};
     const points: number[][] = [];
     let frame = [0, 0];
-    for (let i = 0; i <= 3000; i++) {
+    const initial = ctrnn.getOutputs(frame);
+    data.a.push({x: 0, y: initial[0]});
+    data.b.push({x: 0, y: initial[1]});
+    points.push(initial)
+    for (let i = 1; i <= 3000; i++) {
       frame = ctrnn.tick(frame, [], 0.1);
       if (i % 5 === 0) {
         const outputs = ctrnn.getOutputs(frame);
