@@ -26,6 +26,8 @@ export class SineWave extends React.Component<SineWaveProps, {}> {
 						}
 					]}
 					curve="basis"
+					axisLeft={{legend: "Activation", legendPosition: "middle", legendOffset: -40}}
+					axisBottom={{legend: "Step", legendPosition: "middle", legendOffset: 40}}
 					enablePoints={false}
 					enableGridX={true}
 					enableGridY={true}
