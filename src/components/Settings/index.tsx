@@ -23,7 +23,8 @@ export class Settings extends React.Component<SettingsProps, {}> {
       >
         {this.props.ctrnn.nodes.map((node, id) =>
           <Slider key={id} value={node.bias}
-            min={-3.0} max={3.0} stepSize={0.001}
+            min={-16.0} max={16.0} stepSize={0.001}
+            labelStepSize={4}
             intent={colors[id]}
             onChange={value => {
               this.props.onChangeNode(id,
@@ -38,7 +39,8 @@ export class Settings extends React.Component<SettingsProps, {}> {
       >
         {this.props.ctrnn.nodes.map((node, id) =>
           <Slider key={id} value={node.timeConstant}
-            min={0.001} max={2.0} stepSize={0.001}
+            min={0.5} max={10.0} stepSize={0.001}
+            labelValues={[0.5, 2, 4, 6, 8, 10]}
             intent={colors[id]}
             onChange={value => {
               this.props.onChangeNode(id,
@@ -54,8 +56,8 @@ export class Settings extends React.Component<SettingsProps, {}> {
         >
           {weights.map((weight, from) =>
             <Slider key={from + '-' + to} value={weight}
-              labelStepSize={2.5} intent={colors[from]}
-              min={-5.0} max={5.0} stepSize={0.001}
+              labelStepSize={4} intent={colors[from]}
+              min={-16.0} max={16.0} stepSize={0.001}
               onChange={value => {
                 this.props.onChangeWeight(from, to, value);
               }}
