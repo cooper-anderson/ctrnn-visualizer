@@ -17,7 +17,8 @@ type AppState = {
   data: { a: Point[], b: Point[] },
   fixed: { a: Point[], b: Point[] },
   phaseData: number[][][],
-  points: number[][]
+  points: number[][],
+  stepsize: number
 }
 
 class App extends React.Component<{}, AppState> {
@@ -27,6 +28,7 @@ class App extends React.Component<{}, AppState> {
     fixed: { a: [], b: [] },
     phaseData: [],
     points: [],
+    stepsize: 0.1,
     ctrnn: {
       nodes: [
         { bias: -2.75, timeConstant: 1.0 },
@@ -94,6 +96,11 @@ class App extends React.Component<{}, AppState> {
     requestAnimationFrame(animate);
   }
 
+  onChangeStepsize(value: number) {
+    this.setState({stepsize: value});
+    this.update();
+  }
+
   updateFixed() {
     let ctrnn = new Ctrnn(2);
     this.updateNetwork(ctrnn);
@@ -103,18 +110,34 @@ class App extends React.Component<{}, AppState> {
     const initial = ctrnn.getOutputs(frame);
     data.a.push({x: 0, y: initial[0]});
     data.b.push({x: 0, y: initial[1]});
-    points.push(initial)
-    for (let i = 1; i <= 3000; i++) {
-      frame = ctrnn.tick(frame, [], 0.1);
-      if (i % 5 === 0) {
-        const outputs = ctrnn.getOutputs(frame);
-        if (i % 3 === 0) {
-          data.a.push({x: i, y: outputs[0]});
-          data.b.push({x: i, y: outputs[1]});
-        }
+    points.push(initial);
+    let last_x = 0, s = this.state.stepsize;
+    for (let i = s; i <= 30; i += s) {
+      frame = ctrnn.tick(frame, [], this.state.stepsize);
+      const outputs = ctrnn.getOutputs(frame);
+      const x = Math.floor(i * 100) / 100;
+      if (x > last_x) {
+        last_x = x;
+        data.a.push({x: x, y: outputs[0]});
+        data.b.push({x: x, y: outputs[1]});
         points.push(outputs);
       }
     }
+
+    frame = ctrnn.tick(frame, [], this.state.stepsize);
+    const last = [data.a[data.a.length - 1], data.b[data.b.length - 1]];
+    const outputs = ctrnn.getOutputs(frame);
+    const next = []
+    const left = (30 - last_x) / s;
+    console.log(left);
+    for (let i = 0; i < frame.length; i++) {
+      console.log(last[i].x, outputs[i]);
+      next.push(last[i].y + (outputs[i] - last[i].y) * left);
+    }
+    data.a.push({x: 30, y: next[0]});
+    data.b.push({x: 30, y: next[1]});
+    points.push(outputs);
+
     this.setState({fixed: data, points: points});
   }
 
@@ -130,7 +153,7 @@ class App extends React.Component<{}, AppState> {
           point[1] - this.state.ctrnn.nodes[1].bias
         ];
         const control = ctrnn.getOutputs(biased);
-        const frame = ctrnn.tick(biased, [], 0.2);
+        const frame = ctrnn.tick(biased, [], this.state.stepsize);
         const outputs = ctrnn.getOutputs(frame);
         const diff = [outputs[0] - control[0], outputs[1] - control[1]];
         const mag = Math.hypot(diff[0], diff[1]);
@@ -157,6 +180,8 @@ class App extends React.Component<{}, AppState> {
                 ctrnn={this.state.ctrnn}
                 onChangeNode={this.onChangeNode.bind(this)}
                 onChangeWeight={this.onChangeWeight.bind(this)}
+                onChangeStepsize={this.onChangeStepsize.bind(this)}
+                stepsize={this.state.stepsize}
               />
             </Card>
           </div>

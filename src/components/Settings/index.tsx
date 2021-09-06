@@ -11,6 +11,8 @@ export type Structure = {
 type SettingsProps = {
   onChangeNode: (id: number, node: Node) => void,
   onChangeWeight: (from: number, to: number, weight: number) => void,
+  onChangeStepsize: (step: number) => void,
+  stepsize: number,
   ctrnn: Structure
 };
 
@@ -65,14 +67,11 @@ export class Settings extends React.Component<SettingsProps, {}> {
           )}
         </FormGroup>
       )}
-      <Callout
-        icon="help"
-        title="Information"
-      >
-        <Text className="information">
-
-        </Text>
-      </Callout>
+      <FormGroup label="Step size">
+        <Slider min={0.01} max={1.0} stepSize={0.001} intent={Intent.WARNING}
+          labelValues={[0.01, 0.25, 0.5, 0.75, 1]}
+          value={this.props.stepsize} onChange={this.props.onChangeStepsize}/>
+      </FormGroup>
       </>
   }
 }
