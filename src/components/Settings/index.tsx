@@ -19,6 +19,7 @@ type SettingsProps = {
 export class Settings extends React.Component<SettingsProps, {}> {
   render() {
     const colors = [Intent.PRIMARY, Intent.SUCCESS];
+    const full = [[Intent.PRIMARY, Intent.WARNING], [Intent.DANGER, Intent.SUCCESS]];
     return <>
       <FormGroup
         label="Node Biases"
@@ -58,7 +59,7 @@ export class Settings extends React.Component<SettingsProps, {}> {
         >
           {weights.map((weight, from) =>
             <Slider key={from + '-' + to} value={weight}
-              labelStepSize={4} intent={colors[from]}
+              labelStepSize={4} intent={full[from][to]}
               min={-16.0} max={16.0} stepSize={0.001}
               onChange={value => {
                 this.props.onChangeWeight(from, to, value);
