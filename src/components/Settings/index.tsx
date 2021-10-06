@@ -19,7 +19,7 @@ type SettingsProps = {
 export class Settings extends React.Component<SettingsProps, {}> {
   render() {
     const colors = [Intent.PRIMARY, Intent.SUCCESS];
-    const full = [[Intent.PRIMARY, Intent.WARNING], [Intent.DANGER, Intent.SUCCESS]];
+    const full = [[Intent.PRIMARY, Intent.DANGER], [Intent.WARNING, Intent.SUCCESS]];
     return <>
       <FormGroup
         label="Node Biases"
