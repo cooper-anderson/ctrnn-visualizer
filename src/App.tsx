@@ -22,6 +22,15 @@ type AppState = {
   stepsize: number
 }
 
+function sample(array: any[], n: number): any[] {
+  const step = (array.length - 1) / (n - 1);
+  const sampled: any[] = [];
+  for (let i = 0; i < n; i++) {
+    sampled.push(array[Math.round(i * step)]);
+  }
+  return sampled;
+}
+
 class App extends React.Component<{}, AppState> {
   state: AppState = {
     frame: 0,
@@ -106,38 +115,24 @@ class App extends React.Component<{}, AppState> {
     let ctrnn = new Ctrnn(2);
     this.updateNetwork(ctrnn);
     const data: { a: Point[], b: Point[] } = {a: [], b: []};
-    const points: number[][] = [];
+    let points: number[][] = [];
     let frame = ctrnn.frameFromOutput(this.start);
     const initial = ctrnn.getOutputs(frame);
     data.a.push({x: 0, y: initial[0]});
     data.b.push({x: 0, y: initial[1]});
     points.push(initial);
-    let last_x = 0, s = this.state.stepsize;
-    for (let i = s; i <= 30; i += s) {
+    const s = this.state.stepsize;
+    for (let i = s; i <= 301; i += s) {
       frame = ctrnn.tick(frame, [], this.state.stepsize);
       const outputs = ctrnn.getOutputs(frame);
-      const x = Math.floor(i * 100) / 100;
-      if (x > last_x) {
-        last_x = x;
-        data.a.push({x: x, y: outputs[0]});
-        data.b.push({x: x, y: outputs[1]});
-        points.push(outputs);
-      }
+      data.a.push({x: i, y: outputs[0]});
+      data.b.push({x: i, y: outputs[1]});
+      points.push(outputs);
     }
 
-    frame = ctrnn.tick(frame, [], this.state.stepsize);
-    const last = [data.a[data.a.length - 1], data.b[data.b.length - 1]];
-    const outputs = ctrnn.getOutputs(frame);
-    const next = []
-    const left = (30 - last_x) / s;
-    console.log(left);
-    for (let i = 0; i < frame.length; i++) {
-      console.log(last[i].x, outputs[i]);
-      next.push(last[i].y + (outputs[i] - last[i].y) * left);
-    }
-    data.a.push({x: 30, y: next[0]});
-    data.b.push({x: 30, y: next[1]});
-    points.push(outputs);
+    data.a = sample(data.a, 301);
+    data.b = sample(data.b, 301);
+    points = sample(points, 301);
 
     this.setState({fixed: data, points: points});
   }
