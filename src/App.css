@@ -13,7 +13,7 @@
   grid-template-rows: 50% 50%;
   grid-template-areas:
     "settings sinewave sinewave"
-    "settings phaseportrait none"
+    "settings phaseportrait physicalgraph"
 }
 
 .Dashboard > div {
@@ -34,4 +34,7 @@
 }
 .PhasePortrait {
   grid-area: phaseportrait;
+}
+.PhysicalGraph {
+  grid-area: physicalgraph;
 }

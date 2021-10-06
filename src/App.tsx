@@ -4,6 +4,7 @@ import { Card, Elevation } from '@blueprintjs/core';
 import { Settings, Structure } from './components/Settings';
 import { Network } from './components/Network';
 import { SineWave } from './components/SineWave';
+import { PhysicalGraph } from './components/PhysicalGraph';
 import { Ctrnn, Node } from 'ctrnn.js';
 import { PhasePortrait } from './components/PhasePortrait';
 import { getField } from "./sigmoid";
@@ -200,6 +201,11 @@ class App extends React.Component<{}, AppState> {
               <PhasePortrait margin={15} data={this.state.phaseData}
                 points={this.state.points}
                 onChangeStart={this.onChangeStart.bind(this)} />
+            </Card>
+          </div>
+          <div className="PhysicalGraph">
+            <Card elevation={Elevation.ZERO}>
+              <PhysicalGraph a={this.state.fixed.a} b={this.state.fixed.b} margin={15} />
             </Card>
           </div>
         </div>
