@@ -69,7 +69,7 @@ export class Settings extends React.Component<SettingsProps, {}> {
         </FormGroup>
       )}
       <FormGroup label="Step size">
-        <Slider min={0.01} max={1.0} stepSize={0.001} intent={Intent.WARNING}
+        <Slider min={0.01} max={1.0} stepSize={0.001} intent={Intent.NONE}
           labelValues={[0.01, 0.25, 0.5, 0.75, 1]}
           value={this.props.stepsize} onChange={this.props.onChangeStepsize}/>
       </FormGroup>
