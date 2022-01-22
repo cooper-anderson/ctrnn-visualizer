@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Test from "../components/Test.svelte";
+  import Test from "../vega/Test.svelte";
 </script>
 
 <Test />
