@@ -1,32 +1,28 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
-  import Matrix from "../vega/Matrix.svelte";
+	import { onDestroy } from 'svelte';
+	import Matrix from '../vega/Matrix.svelte';
+	import Wind from '../vega/Wind.svelte';
+	import { default as FluctuatorVega } from '../vega/Fluctuator.svelte';
+	import { Fluctuator } from 'ctrnn.js';
 
-  import { RlCtrnn } from "ctrnn.js";
+	import { RlCtrnn } from 'ctrnn.js';
 
-  let ctrnn = new RlCtrnn(10);
-  let opts: number[][] = [];
+	let ctrnn = new RlCtrnn(2);
+	ctrnn.setBias(0, -2.75);
+	ctrnn.setBias(1, -1.75);
+	ctrnn.setWeight(0, 0, 4.5 - 1);
+	ctrnn.setWeight(0, 1, -1.0);
+	ctrnn.setWeight(1, 0, 1.0);
+	ctrnn.setWeight(1, 1, 4.5 + 1);
 
-  for (let i = 0; i < ctrnn.size; i++) {
-    opts[i] = [];
-    for (let j = 0; j < ctrnn.size; j++) {
-      opts[i][j] = Math.random() * 2 * Math.PI;
-    }
-  }
-
-  let interval = setInterval(() => {
-    for (let i = 0; i < ctrnn.size; i++) {
-      for (let j = 0; j < ctrnn.size; j++) {
-        let w = Math.sin(Date.now() / (1000 - 100 * opts[i][j]));
-        ctrnn.setWeight(i, j, w);
-      }
-    }
-    ctrnn = ctrnn;
-  }, 1000/60);
-
-  onDestroy(() => {
-    clearInterval(interval);
-  });
+	let voltages = ctrnn.init_voltage();
+	let interval = setInterval(() => {
+		voltages = ctrnn.update(0.05, voltages);
+		ctrnn = ctrnn;
+		// console.log(ctrnn.weights[0][0]);
+	}, 1000 / 60);
 </script>
 
-<Matrix ctrnn={ctrnn} />
+<!-- <Matrix {ctrnn} />
+<Wind {ctrnn} /> -->
+<FluctuatorVega />
