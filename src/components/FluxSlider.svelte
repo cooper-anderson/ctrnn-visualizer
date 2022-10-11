@@ -1,10 +1,8 @@
 <script lang="ts">
-	import RangeSlider from 'svelte-range-slider-pips';
-
 	export let center: number;
 	export let amplitude: number;
 	export let range: [number, number];
-	export let step = 0.1;
+	export let step = 0.01;
 
 	$: min = range[0];
 	$: max = range[1];
@@ -21,39 +19,52 @@
 			style="left: {Math.max(0, left * 100)}%; right: {Math.max(0, right * 100)}%"
 		/>
 	</div>
-	<RangeSlider
-		bind:values={center}
-		{min}
-		{max}
-		{step}
-		pips
-		pipstep={40}
-		first="label"
-		last="label"
-		springValues={{ stiffness: 1, damping: 1 }}
-	/>
+	<input type="range" bind:value={center} {min} {max} {step} />
 </div>
 
 <style>
 	.container {
 		position: relative;
+		height: 40px;
 	}
 
 	.amplitude {
 		pointer-events: none;
 		position: absolute;
+		background-color: #eee;
 		height: 8px;
 		margin: 1em;
 		left: 0px;
 		right: 0px;
-		top: -16px;
-		z-index: 1;
+		top: 0px;
+		border-radius: 8px;
 	}
 
 	.amplitude-inner {
+		pointer-events: none;
 		position: absolute;
 		height: 100%;
 		background-color: #4a40d4;
 		border-radius: 8px;
+	}
+
+	input[type='range'] {
+		-webkit-appearance: none;
+		height: 8px;
+		left: 6px;
+		right: 6px;
+		position: absolute;
+		background-color: transparent;
+		top: 14px;
+	}
+
+	input[type='range']::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		background-color: #4a40d4;
+		opacity: 0.9;
+		width: 16px;
+		height: 16px;
+		border-radius: 10px;
+		cursor: pointer;
 	}
 </style>

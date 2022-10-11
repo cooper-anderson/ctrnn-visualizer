@@ -10,7 +10,7 @@
 	$: data = { table };
 	let t = 0;
 
-	const flux = new Fluctuator(2);
+	export let flux = new Fluctuator(2);
 	flux.convergence_rate *= 5;
 	// // flux.amplitude /= 10;
 	// let data = getData(flux);

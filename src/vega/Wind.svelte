@@ -13,7 +13,7 @@
 		speed: number;
 	};
 
-	export let ctrnn: RlCtrnn;
+	export let ctrnn: ICTRNN;
 	$: data = getData(ctrnn);
 
 	const step = 1 / 50;
