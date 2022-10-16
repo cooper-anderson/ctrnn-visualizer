@@ -3,6 +3,7 @@
 	export let amplitude: number;
 	export let range: [number, number];
 	export let step = 0.01;
+	export let locked = false;
 
 	$: min = range[0];
 	$: max = range[1];
@@ -10,6 +11,14 @@
 
 	$: left = (center - min - amplitude) / span;
 	$: right = 1.0 - (center - min + amplitude) / span;
+
+	function mousedown() {
+		locked = true;
+	}
+
+	function mouseup() {
+		locked = false;
+	}
 </script>
 
 <div class="container">
@@ -19,7 +28,15 @@
 			style="left: {Math.max(0, left * 100)}%; right: {Math.max(0, right * 100)}%"
 		/>
 	</div>
-	<input type="range" bind:value={center} {min} {max} {step} />
+	<input
+		on:mousedown={mousedown}
+		on:mouseup={mouseup}
+		type="range"
+		bind:value={center}
+		{min}
+		{max}
+		{step}
+	/>
 </div>
 
 <style>

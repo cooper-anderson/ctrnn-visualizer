@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { Fluctuator as Flux } from 'ctrnn.js';
 
 	import { RlCtrnn } from 'ctrnn.js';
-	import { Ctrnn } from 'ctrnn.js';
 	import Fluctuator from '../components/Fluctuator.svelte';
 	import Wind from '../vega/Wind.svelte';
 
@@ -16,41 +14,56 @@
 	ctrnn.setWeight(1, 1, 4.5);
 
 	$: fluctuators = ctrnn.fluctuators;
+	const locks = [
+		[false, false],
+		[false, false]
+	];
+
+	let amplitude = 0.1;
+	ctrnn.fluctuators[0][0].amplitude = amplitude;
+	ctrnn.fluctuators[0][1].amplitude = amplitude * 0;
+	ctrnn.fluctuators[1][0].amplitude = amplitude * 0;
+	ctrnn.fluctuators[1][1].amplitude = amplitude * 0;
 
 	let voltages = ctrnn.init_voltage();
-	// let flux = new Flux(0);
-	// flux.amplitude_range.min = 0;
-	// flux.convergence_rate /= 5;
+	$: outputs = ctrnn.getOutputs(voltages);
+	let last = [0, 0];
+	let activity = 0;
 	let interval = setInterval(() => {
-		voltages = ctrnn.update(0.05, voltages, undefined, true);
+		let a = 0;
+		for (let i = 0; i < outputs.length; i++) {
+			a += Math.abs(outputs[i] - last[i]);
+		}
+		activity = 0.99 * activity + 0.01 * a;
+		last = outputs;
+		voltages = ctrnn.update(0.05, voltages);
+		for (let pre = 0; pre < ctrnn.size; pre++) {
+			for (let post = 0; post < ctrnn.size; post++) {
+				if (locks[pre][post]) {
+					fluctuators[pre][post].amplitude = 0;
+				} else {
+					fluctuators[pre][post].update(0.05, activity - 0.003);
+				}
+			}
+		}
 		ctrnn = ctrnn;
-		// flux.update(0.05, 0.01);
-		// console.log(flux.center);
-		// voltages = ctrnn.update(0.05, voltages);
-		// ctrnn = ctrnn;
-		// flux = flux;
-	}, 1000 / 60);
+	}, 5);
 
 	onDestroy(() => {
 		clearInterval(interval);
 	});
 </script>
 
-<!--Fluctuator bind:fluctuator={flux} /-->
 <div class="container">
 	<div class="fluxs">
-		<div>{ctrnn.weights[0][0]}</div>
-		<div>{ctrnn.weights[0][1]}</div>
-		<div>{ctrnn.weights[1][0]}</div>
-		<div>{ctrnn.weights[1][1]}</div>
-		<Fluctuator bind:fluctuator={fluctuators[0][0]} />
-		<Fluctuator bind:fluctuator={fluctuators[0][1]} />
-		<Fluctuator bind:fluctuator={fluctuators[1][0]} />
-		<Fluctuator bind:fluctuator={fluctuators[1][1]} />
-		<div>{fluctuators[0][0].center}</div>
-		<div>{fluctuators[0][1].center}</div>
-		<div>{fluctuators[1][0].center}</div>
-		<div>{fluctuators[1][1].center}</div>
+		{#each fluctuators as row, pre}
+			{#each row as flux, post}
+				<Fluctuator bind:fluctuator={flux} bind:locked={locks[pre][post]} />
+			{/each}
+		{/each}
+		<div>{outputs[0]}</div>
+		<div>{outputs[1]}</div>
+		<div>{activity}</div>
 	</div>
 	<div class="wind">
 		<Wind {ctrnn} />

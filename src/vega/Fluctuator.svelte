@@ -11,13 +11,7 @@
 	let t = 0;
 
 	export let flux = new Fluctuator(2);
-	flux.convergence_rate *= 2;
-	// flux.learning_rate *= 5;
-	flux.amplitude /= 10;
-	// let data = getData(flux);
-
-	// function getData(flux: Fluctuator): { table: Datum[] } {
-	// 	const table: Datum[] = [];
+	export let reward = 0;
 
 	table.push(
 		...[
@@ -28,17 +22,7 @@
 		]
 	);
 
-	let last = flux.value;
-	let reward = 0;
 	let interval = setInterval(() => {
-		const abs = Math.abs(flux.value);
-		const r = (Math.abs(last) - Math.abs(flux.value)) / 10;
-		reward = r;
-		flux.amplitude = Math.min(abs, 10);
-		// reward = -Math.abs(flux.value) / 10;
-		// reward = reward * 0.99 + r * 0.01;
-		last = flux.value;
-		flux.update(0.05, reward);
 		const time = Math.round(t * 100) / 100;
 
 		const next = [
