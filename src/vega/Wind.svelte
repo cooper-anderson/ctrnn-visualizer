@@ -5,12 +5,19 @@
 	import { Vega } from 'svelte-vega';
 	import spec from '../spec/wind';
 
+	export let dt = 0.05;
+
 	type Vec = {
 		longitude: number;
 		latitude: number;
 		dir: number;
 		// dirCat: number;
 		speed: number;
+	};
+
+	type Point = {
+		x: number;
+		y: number;
 	};
 
 	export let ctrnn: ICTRNN;
@@ -25,7 +32,7 @@
 		return outputs.map((v, i) => clampSigmoid(v) - ctrnn.biases[i]);
 	}
 
-	function getData(ctrnn: ICTRNN): { vectors: Vec[] } {
+	function getData(ctrnn: ICTRNN): { vectors: Vec[]; points: Point[] } {
 		const vectors: Vec[] = [];
 		for (let y = 0; y <= 1; y += step) {
 			for (let x = 0; x <= 1; x += step) {
@@ -48,7 +55,19 @@
 			}
 		}
 
-		return { vectors };
+		return { vectors, points: getTrajectory(ctrnn) };
+	}
+
+	function getTrajectory(ctrnn: ICTRNN): Point[] {
+		let points = [];
+		let voltage = ctrnn.init_voltage();
+		for (let t = 0; t < 50; t += dt) {
+			const output = ctrnn.getOutputs(voltage);
+			points.push({ x: output[0], y: output[1] });
+			voltage = ctrnn.update(dt, voltage);
+		}
+
+		return points;
 	}
 </script>
 

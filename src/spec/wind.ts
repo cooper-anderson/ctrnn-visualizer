@@ -29,6 +29,10 @@ export default {
 		{
 			name: 'vectors',
 			format: { type: 'json' }
+		},
+		{
+			name: 'points',
+			format: { type: 'json' }
 		}
 	],
 
@@ -47,6 +51,16 @@ export default {
 			paddingOuter: 0.5,
 			reverse: true,
 			domain: { data: 'vectors', field: 'latitude', sort: true }
+		},
+		{
+			name: 'x',
+			type: 'linear',
+			range: 'width'
+		},
+		{
+			name: 'y',
+			type: 'linear',
+			range: 'height'
 		},
 		{
 			name: 'size',
@@ -75,6 +89,18 @@ export default {
 				update: {
 					shape: { signal: 'shape' },
 					size: { scale: 'size', field: 'speed' }
+				}
+			}
+		},
+		{
+			type: 'line',
+			from: { data: 'points' },
+			encode: {
+				enter: {
+					x: { scale: 'x', field: 'x' },
+					y: { scale: 'y', field: 'y' },
+					stroke: { value: '#fff' },
+					strokeWidth: { value: 1 }
 				}
 			}
 		}
