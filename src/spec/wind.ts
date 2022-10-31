@@ -1,3 +1,4 @@
+import { scheme } from 'vega';
 import type { VisualizationSpec } from 'vega-embed';
 
 export default {
@@ -6,24 +7,7 @@ export default {
 	width: 700,
 	height: 700,
 	padding: 2,
-	// width: 800,
-	// height: 600,
-	// padding: 5,
-	// autosize: { type: "none", contains: "padding" },
 	background: '#111',
-
-	signals: [
-		{
-			name: 'shape',
-			value: 'wedge',
-			bind: { input: 'select', options: ['wedge', 'arrow'] }
-		},
-		{
-			name: 'maxSize',
-			value: 700,
-			bind: { input: 'range', min: 50, max: 700, step: 10 }
-		}
-	],
 
 	data: [
 		{
@@ -53,25 +37,33 @@ export default {
 			domain: { data: 'vectors', field: 'latitude', sort: true }
 		},
 		{
-			name: 'x',
-			type: 'linear',
-			range: 'width'
-		},
-		{
-			name: 'y',
-			type: 'linear',
-			range: 'height'
-		},
-		{
 			name: 'size',
 			domain: { data: 'vectors', field: 'speed' },
 			zero: true,
-			range: [0, { signal: 'maxSize' }]
+			range: [0, 700]
 		},
 		{
 			name: 'color',
 			domain: [0, 360],
 			range: { scheme: 'rainbow' }
+		},
+		{
+			name: 'x',
+			type: 'linear',
+			range: 'width',
+			paddingOuter: 0.5
+		},
+		{
+			name: 'y',
+			type: 'linear',
+			range: 'height',
+			paddingOuter: 0.5
+		},
+		{
+			name: 'opacity',
+			domain: [0, 20],
+			range: [0, 1]
+			// domain: { data: 'points', field: 'time' }
 		}
 	],
 
@@ -84,10 +76,10 @@ export default {
 					x: { scale: 'xscale', field: 'longitude' },
 					y: { scale: 'yscale', field: 'latitude' },
 					fill: { scale: 'color', field: 'dir' },
-					angle: { field: 'dir', offset: 180 }
+					angle: { field: 'dir', offset: 0 }
 				},
 				update: {
-					shape: { signal: 'shape' },
+					shape: { value: 'wedge' },
 					size: { scale: 'size', field: 'speed' }
 				}
 			}
@@ -97,10 +89,15 @@ export default {
 			from: { data: 'points' },
 			encode: {
 				enter: {
-					x: { scale: 'x', field: 'x' },
-					y: { scale: 'y', field: 'y' },
+					x: { scale: 'x', field: 'y' },
+					y: { scale: 'y', field: 'x' },
 					stroke: { value: '#fff' },
 					strokeWidth: { value: 1 }
+					// opacity: { scale: 'opacity', field: 'time' }
+				},
+				update: {
+					// stroke: { scale: 'opacity', field: 'time' }
+					// opacity: { scale: 'opacity', field: 'time' }
 				}
 			}
 		}

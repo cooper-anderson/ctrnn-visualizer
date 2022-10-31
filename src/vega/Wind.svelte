@@ -5,7 +5,12 @@
 	import { Vega } from 'svelte-vega';
 	import spec from '../spec/wind';
 
-	export let dt = 0.05;
+	export let points: Point[];
+
+	type Point = {
+		x: number;
+		y: number;
+	};
 
 	type Vec = {
 		longitude: number;
@@ -13,11 +18,6 @@
 		dir: number;
 		// dirCat: number;
 		speed: number;
-	};
-
-	type Point = {
-		x: number;
-		y: number;
 	};
 
 	export let ctrnn: ICTRNN;
@@ -55,19 +55,7 @@
 			}
 		}
 
-		return { vectors, points: getTrajectory(ctrnn) };
-	}
-
-	function getTrajectory(ctrnn: ICTRNN): Point[] {
-		let points = [];
-		let voltage = ctrnn.init_voltage();
-		for (let t = 0; t < 50; t += dt) {
-			const output = ctrnn.getOutputs(voltage);
-			points.push({ x: output[0], y: output[1] });
-			voltage = ctrnn.update(dt, voltage);
-		}
-
-		return points;
+		return { vectors, points };
 	}
 </script>
 
