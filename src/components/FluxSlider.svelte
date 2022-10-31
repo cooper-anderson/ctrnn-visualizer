@@ -4,6 +4,7 @@
 	export let range: [number, number];
 	export let step = 0.01;
 	export let locked = false;
+	export let color: 'blue' | 'yellow' | 'red' | 'green' = 'blue';
 
 	$: min = range[0];
 	$: max = range[1];
@@ -24,11 +25,12 @@
 <div class="container">
 	<div class="amplitude">
 		<div
-			class="amplitude-inner"
+			class="amplitude-inner {color}"
 			style="left: {Math.max(0, left * 100)}%; right: {Math.max(0, right * 100)}%"
 		/>
 	</div>
 	<input
+		class={color}
 		on:mousedown={mousedown}
 		on:mouseup={mouseup}
 		type="range"
@@ -48,7 +50,7 @@
 	.amplitude {
 		pointer-events: none;
 		position: absolute;
-		background-color: #eee;
+		background-color: #333;
 		height: 8px;
 		margin: 1em;
 		left: 0px;
@@ -61,8 +63,23 @@
 		pointer-events: none;
 		position: absolute;
 		height: 100%;
-		background-color: #4a40d4;
 		border-radius: 8px;
+	}
+
+	.amplitude-inner.blue {
+		background-color: #137cbd;
+	}
+
+	.amplitude-inner.yellow {
+		background-color: #d9822b;
+	}
+
+	.amplitude-inner.red {
+		background-color: #db3737;
+	}
+
+	.amplitude-inner.green {
+		background-color: #0f9960;
 	}
 
 	input[type='range'] {
@@ -77,11 +94,26 @@
 
 	input[type='range']::-webkit-slider-thumb {
 		-webkit-appearance: none;
-		background-color: #4a40d4;
 		opacity: 0.9;
 		width: 16px;
 		height: 16px;
 		border-radius: 10px;
 		cursor: pointer;
+	}
+
+	input[type='range'].blue::-webkit-slider-thumb {
+		background-color: #137cbd;
+	}
+
+	input[type='range'].yellow::-webkit-slider-thumb {
+		background-color: #d9822b;
+	}
+
+	input[type='range'].red::-webkit-slider-thumb {
+		background-color: #db3737;
+	}
+
+	input[type='range'].green::-webkit-slider-thumb {
+		background-color: #0f9960;
 	}
 </style>

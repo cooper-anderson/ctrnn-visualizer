@@ -4,6 +4,7 @@
 
 	export let fluctuator: Fluctuator;
 	export let locked: boolean = false;
+	export let color: 'blue' | 'yellow' | 'red' | 'green' = 'blue';
 </script>
 
 <FluxSlider
@@ -11,4 +12,5 @@
 	bind:locked
 	amplitude={fluctuator.amplitude}
 	range={[fluctuator.range.min, fluctuator.range.max]}
+	{color}
 />
