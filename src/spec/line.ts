@@ -3,8 +3,8 @@ import type { VisualizationSpec } from 'vega-embed';
 export default {
 	$schema: 'https://vega.github.io/schema/vega/v5.json',
 	description: 'A basic line chart example.',
-	width: 2 * 770,
-	height: 770,
+	width: 770,
+	height: 0.5 * 770,
 	padding: 5,
 
 	signals: [
@@ -64,7 +64,8 @@ export default {
 			scale: 'x',
 			labelColor: '#ffffff',
 			labelOverlap: true,
-			labelSeparation: 100
+			labelSeparation: 100,
+			ticks: false
 		},
 		{ orient: 'left', scale: 'y', labelColor: '#ffffff' }
 	],
