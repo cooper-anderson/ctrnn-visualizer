@@ -4,8 +4,9 @@ import type { VisualizationSpec } from 'vega-embed';
 export default {
 	$schema: 'https://vega.github.io/schema/vega/v5.json',
 	description: 'A flow map of wind direction and speed.',
-	width: 700,
-	height: 700,
+	// width: 700,
+	// height: 700,
+	autosize: 'none',
 	padding: 2,
 	background: '#111',
 

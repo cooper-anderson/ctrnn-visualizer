@@ -1,11 +1,13 @@
 <script lang="ts">
-	import type { ICTRNN, RlCtrnn } from 'ctrnn.js';
+	import type { ICTRNN } from 'ctrnn.js';
 	import { inverseSigmoid } from 'ctrnn.js/src/activation';
 
 	import { Vega } from 'svelte-vega';
-	import spec from '../spec/wind';
+	import wind from '../spec/wind';
 
-	export let points: Point[];
+	export let points: Point[] = [];
+	export let width: number = 300;
+	export let height: number = 300;
 
 	type Point = {
 		x: number;
@@ -23,7 +25,7 @@
 	export let ctrnn: ICTRNN;
 	$: data = getData(ctrnn);
 
-	const step = 1 / 50;
+	const step = 1 / 25;
 
 	function clampSigmoid(v: number): number {
 		return inverseSigmoid(Math.min(Math.max(v, 0.01), 0.99));
@@ -57,6 +59,22 @@
 
 		return { vectors, points };
 	}
+
+	// $: min = Math.min(width, height) - 10;
+	$: spec = {
+		...wind,
+		width: width,
+		height: height
+	};
 </script>
 
+<!-- <div class="container"> -->
 <Vega {data} {spec} view={undefined} />
+
+<!-- </div> -->
+<style>
+	.container {
+		/* width: 100%;
+		height: 100%; */
+	}
+</style>
