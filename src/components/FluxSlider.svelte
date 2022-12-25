@@ -4,7 +4,7 @@
 	export let range: [number, number];
 	export let step = 0.01;
 	export let locked = false;
-	export let color: 'blue' | 'yellow' | 'red' | 'green' = 'blue';
+	export let color: 'blue' | 'yellow' | 'red' | 'green' | 'grey' = 'grey';
 
 	$: min = range[0];
 	$: max = range[1];
@@ -82,6 +82,10 @@
 		background-color: #0f9960;
 	}
 
+	.amplitude-inner.grey {
+		background-color: #888888;
+	}
+
 	input[type='range'] {
 		-webkit-appearance: none;
 		height: 8px;
@@ -115,5 +119,9 @@
 
 	input[type='range'].green::-webkit-slider-thumb {
 		background-color: #0f9960;
+	}
+
+	input[type='range'].grey::-webkit-slider-thumb {
+		background-color: #888888;
 	}
 </style>

@@ -4,7 +4,7 @@
 
 	export let fluctuator: Fluctuator;
 	export let locked: boolean = false;
-	export let color: 'blue' | 'yellow' | 'red' | 'green' = 'blue';
+	export let color: 'blue' | 'yellow' | 'red' | 'green' | 'grey' = 'grey';
 </script>
 
 <FluxSlider
