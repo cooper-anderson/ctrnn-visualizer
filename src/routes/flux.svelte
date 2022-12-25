@@ -34,6 +34,17 @@
 	});
 </script>
 
-<Fluctuator bind:fluctuator={flux} bind:locked />
-<Fluctuator bind:fluctuator={input} />
-<FluxGraph bind:flux {reward} />
+<div class="container">
+	<Fluctuator bind:fluctuator={flux} bind:locked />
+	<Fluctuator bind:fluctuator={input} />
+	<FluxGraph bind:flux {reward} />
+</div>
+
+<style>
+	.container {
+		background-color: black;
+		position: absolute;
+		height: 100%;
+		width: 100%;
+	}
+</style>
