@@ -40,6 +40,7 @@
 			for (let x = 0; x <= 1; x += step) {
 				const pos = [x, y];
 				const before = getVoltage(pos, ctrnn);
+				while (before.length < ctrnn.size) before.push(0);
 				const after = ctrnn.update(0.05, before);
 				const outputs = ctrnn.getOutputs(after);
 				const diff = [outputs[0] - pos[0], outputs[1] - pos[1]];

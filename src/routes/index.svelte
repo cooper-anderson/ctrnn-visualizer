@@ -7,7 +7,7 @@
 	import Activity from '../vega/Activity.svelte';
 
 	const DT = 0.05;
-	const QUEUE_DURATION = 5;
+	const QUEUE_DURATION = 2;
 	const QUEUE_LENGTH = QUEUE_DURATION / DT;
 
 	let time = 0;
@@ -18,6 +18,7 @@
 	ctrnn.setWeight(0, 1, -1.0);
 	ctrnn.setWeight(1, 0, 1.0);
 	ctrnn.setWeight(1, 1, 4.5);
+	// ctrnn.addNode();
 
 	for (const asdf of ctrnn.fluctuators) {
 		for (const flux of asdf) {
@@ -28,7 +29,7 @@
 	}
 
 	$: fluctuators = ctrnn.fluctuators;
-	const locks = Array(ctrnn.size).fill(Array(ctrnn.size).fill(false));
+	let locks = Array(ctrnn.size).fill(Array(ctrnn.size).fill(false));
 	// const locks = [
 	// 	[false, false],
 	// 	[false, false]
@@ -49,48 +50,54 @@
 	$: outputs = ctrnn.getOutputs(voltages);
 	let last = [0, 0];
 
-	let queue = [];
-	let avg_queue = [];
-	let fitness_sum = 0;
-	let avg_fitness_sum = 0;
+	let activityHistory = [];
+	let fitnessHistory = [];
+	let fitness_sums = [];
+	let avg_fitness_sums = [];
 	let reward = 0;
 
 	let fluxQueue = [];
 	let pointsQueue = [];
 
 	let interval = setInterval(() => {
-		let activity = 0;
-		for (let i = 0; i < outputs.length; i++) {
-			activity += Math.abs(outputs[i] - last[i]);
+		if (locks.length < ctrnn.size) {
+			locks = Array(ctrnn.size).fill(Array(ctrnn.size).fill(false));
 		}
+		while (voltages.length < ctrnn.size) voltages.push(0);
+		while (activityHistory.length < ctrnn.size) activityHistory.push([]);
+		while (fitnessHistory.length < ctrnn.size) fitnessHistory.push([]);
+		while (fitness_sums.length < ctrnn.size) fitness_sums.push(0);
+		while (avg_fitness_sums.length < ctrnn.size) avg_fitness_sums.push(0);
 
-		queue.push(activity);
-		fitness_sum += activity;
-		if (queue.length > QUEUE_LENGTH) {
-			fitness_sum -= queue.shift();
-		}
-		let fitness = fitness_sum / QUEUE_LENGTH;
+		for (let post = 0; post < ctrnn.size; post++) {
+			let activity = Math.abs(outputs[post] - last[post] || 0);
+			activityHistory[post].push(activity);
+			fitness_sums[post] += activity;
+			if (activityHistory[post].length > QUEUE_LENGTH) {
+				fitness_sums[post] -= activityHistory[post].shift();
+			}
+			let fitness = fitness_sums[post] / QUEUE_LENGTH;
 
-		avg_queue.push(fitness);
-		avg_fitness_sum += fitness;
-		if (avg_queue.length > QUEUE_LENGTH) {
-			avg_fitness_sum -= avg_queue.shift();
-		}
-		// reward = fitness_sum - last_fitness; //- 0.1 * DT;
-		let avg_fitness = avg_fitness_sum / QUEUE_LENGTH;
-		reward = fitness - avg_fitness;
+			fitnessHistory[post].push(fitness);
+			avg_fitness_sums[post] += fitness;
+			if (fitnessHistory[post].length > QUEUE_LENGTH) {
+				avg_fitness_sums[post] -= fitnessHistory[post].shift();
+			}
+			let avg_fitness = avg_fitness_sums[post] / QUEUE_LENGTH;
+			let reward = fitness - avg_fitness;
 
-		last = outputs;
-		voltages = ctrnn.update(DT * 20, voltages);
-		for (let pre = 0; pre < ctrnn.size; pre++) {
-			for (let post = 0; post < ctrnn.size; post++) {
+			for (let pre = 0; pre < ctrnn.size; pre++) {
 				if (locks[pre][post]) {
 					fluctuators[pre][post].amplitude = 0;
 				} else {
+					// fluctuators[post][pre].update(DT, reward);
 					fluctuators[pre][post].update(DT, reward);
 				}
 			}
 		}
+
+		last = outputs;
+		voltages = ctrnn.update(DT * 20, voltages);
 
 		let x = Math.floor(time * 100) / 100;
 		let next = [
@@ -99,10 +106,11 @@
 			{ c: 2, x, y: fluctuators[1][0].value },
 			{ c: 3, x, y: fluctuators[1][1].value },
 			{ c: 4, x, y: reward * 100 },
-			{ c: 5, x, y: fitness_sum }
+			{ c: 5, x, y: fitness_sums[0] },
+			{ c: 6, x, y: fitness_sums[1] }
 		];
 		if (fluxQueue.length < 1000) fluxQueue = [...fluxQueue, ...next];
-		else fluxQueue = [...fluxQueue.slice(5), ...next];
+		else fluxQueue = [...fluxQueue.slice(7), ...next];
 
 		let point = { x: outputs[0], y: outputs[1], time: x };
 		pointsQueue.push(point);
@@ -135,6 +143,10 @@
 	onDestroy(() => {
 		clearInterval(interval);
 	});
+
+	function addNode(event: MouseEvent) {
+		ctrnn.addNode();
+	}
 </script>
 
 <div class="container">
@@ -156,6 +168,7 @@
 	</div>
 	<div class="wind">
 		<Wind {ctrnn} points={pointsQueue} />
+		<button on:click={addNode}>add node</button>
 	</div>
 </div>
 
